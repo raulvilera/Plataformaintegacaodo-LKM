@@ -3,7 +3,7 @@ import { STUDENTS_DB } from './studentsData.js';
 
 // Configuração do Supabase
 const supabaseUrl = 'https://zvuxzrfbmmbhuhwaofrn.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2dXh6cmZibW1iaHVod2FvZnJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY2ODkxNDEsImV4cCI6MjA4MjI2NTE0MX0.GpA8qLVeLF01x0baSALC1AmRTcKL90ALpxt35qKLVTQ';
+const supabaseAnonKey = 'sb_publishable_Lbg0ospRXAcdptl3ZSwzZA_HIyhWHhA';
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
