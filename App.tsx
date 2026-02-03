@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Login from '../components/Login';
-import Dashboard from '../components/Dashboard';
-import ProfessorView from '../components/ProfessorView';
+import Login from './components/Login';
+import Dashboard from './components/Dashboard';
+import ProfessorView from './components/ProfessorView';
 import { Incident, View, User } from './types';
 import { fetchIncidents, createIncidents, deleteIncident as deleteIncidentService, subscribeToIncidents } from './services/incidentsService';
 import { logout as supabaseLogout } from './services/authService';

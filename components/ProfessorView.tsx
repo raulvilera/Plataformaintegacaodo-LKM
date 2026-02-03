@@ -1,20 +1,22 @@
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Incident, User } from './types';
-import { STUDENTS_DB } from './studentsData';
+import { Incident, User, Student } from '../types';
+import { fetchStudents } from '../services/studentsService';
 
 interface ProfessorViewProps {
   user: User;
   incidents: Incident[];
   onSave: (incident: Incident | Incident[]) => void;
+  onDelete: (id: string) => void;
   onLogout: () => void;
 }
 
 const DATA_TURMAS = [
   '6ºAno A', '6ºAno B', '6ºAno C', '6ºAno D', '6ºAno E', '6ºAno F',
   '7ºAno A', '7ºAno B', '7ºAno C', '7ºAno D', '7ºAno E', '7ºAno F',
-  '8ºAno A', '8ºAno B', '8ºAno C', '8ºAno D', '8ºAno E', '8ºAno F',
+  '8ºAno A', '8ºAno B', '8ºAno C', '8ºAno D', '8ºAno E',
   '9ºAno A', '9ºAno B', '9ºAno C', '9ºAno D',
-  '1ª Série A', '1ª Série B', '1ª Série C', '1ª Série D', '1ª Série E', '1ª Série F', '1ª Série G', '1ª Série H',
+  '1ª Série A', '1ª Série B', '1ª Série C', '1ª Série D', '1ª Série E', '1ª Série F',
   '2ª Série A', '2ª Série B', '2ª Série C', '2ª Série D', '2ª Série E', '2ª Série F', '2ª Série G', '2ª Série H',
   '3ª Série A', '3ª Série B', '3ª Série C', '3ª Série D', '3ª Série E', '3ª Série F', '3ª Série G', '3ª Série H'
 ];
@@ -24,20 +26,30 @@ const LISTA_IRREGULARIDADES = [
   'INDISCIPLINA', 'DESACATO', 'SEM TAREFA', 'SAIU SEM PERMISSÃO'
 ];
 
-const ProfessorView: React.FC<ProfessorViewProps> = ({ user, incidents, onSave, onLogout }) => {
+/**
+ * ProfessorView component for managing and recording school incidents.
+ * Includes student selection by class, irregularity tags, and incident history.
+ */
+const ProfessorView: React.FC<ProfessorViewProps> = ({ user, incidents, onSave, onDelete, onLogout }) => {
   const [professorName, setProfessorName] = useState('');
   const [classRoom, setClassRoom] = useState('');
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [discipline, setDiscipline] = useState('');
   const [selectedIrregularities, setSelectedIrregularities] = useState<string[]>([]);
   const [description, setDescription] = useState('');
+
   const [registerDate, setRegisterDate] = useState(new Date().toISOString().split('T')[0]);
   const [isSaving, setIsSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [allStudents, setAllStudents] = useState<Student[]>([]);
+
+  useEffect(() => {
+    fetchStudents().then(data => setAllStudents(data));
+  }, []);
 
   const dateInputRef = useRef<HTMLInputElement>(null);
 
-  const studentsInClass = useMemo(() => STUDENTS_DB.filter(a => a.turma === classRoom), [classRoom]);
+  const studentsInClass = useMemo(() => allStudents.filter(a => a.turma === classRoom), [classRoom, allStudents]);
 
   const toggleStudent = (nome: string) => {
     setSelectedStudents(prev =>
@@ -79,7 +91,7 @@ const ProfessorView: React.FC<ProfessorViewProps> = ({ user, incidents, onSave, 
     const formattedDate = `${day}/${month}/${year}`;
 
     const newIncidents: Incident[] = selectedStudents.map((nome, index) => {
-      const studentData = STUDENTS_DB.find(s => s.nome === nome && s.turma === classRoom);
+      const studentData = allStudents.find(s => s.nome === nome && s.turma === classRoom);
       return {
         id: `prof-${Date.now()}-${index}`,
         date: formattedDate,
@@ -183,7 +195,7 @@ const ProfessorView: React.FC<ProfessorViewProps> = ({ user, incidents, onSave, 
                 <h3 className="text-yellow-400 font-black text-[9px] uppercase tracking-widest mb-3 flex items-center gap-2">CONFERÊNCIA DE NOMES E RAs</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                   {selectedStudents.length > 0 ? selectedStudents.map((name, i) => {
-                    const student = STUDENTS_DB.find(s => s.nome === name && s.turma === classRoom);
+                    const student = allStudents.find(s => s.nome === name && s.turma === classRoom);
                     return (
                       <div key={i} className="flex justify-between items-center bg-white/10 px-3 py-2 rounded-lg border border-white/5">
                         <span className="text-[9px] font-bold text-white uppercase truncate mr-2">{name}</span>
@@ -254,6 +266,7 @@ const ProfessorView: React.FC<ProfessorViewProps> = ({ user, incidents, onSave, 
                   <th className="border border-gray-300 px-3 py-3 text-[9px] font-black uppercase text-left">DISCIPLINA</th>
                   <th className="border border-gray-300 px-3 py-3 text-[9px] font-black uppercase text-left">IRREGULARIDADES</th>
                   <th className="border border-gray-300 px-3 py-3 text-[9px] font-black uppercase text-left">DESCRIÇÃO</th>
+                  <th className="border border-gray-300 px-3 py-3 text-[9px] font-black uppercase text-center w-[60px]">AÇÃO</th>
                 </tr>
               </thead>
               <tbody className="bg-white">
@@ -267,9 +280,20 @@ const ProfessorView: React.FC<ProfessorViewProps> = ({ user, incidents, onSave, 
                     <td className="border border-gray-300 px-3 py-2 text-[9px] font-bold text-gray-600 uppercase italic truncate max-w-[120px]">{inc.discipline || '---'}</td>
                     <td className="border border-gray-300 px-3 py-2 text-[9px] font-bold text-red-600 uppercase max-w-[180px] truncate">{inc.irregularities || '---'}</td>
                     <td className="border border-gray-300 px-3 py-2 text-[9px] font-medium text-gray-400 max-w-[250px] truncate">{inc.description}</td>
+                    <td className="border border-gray-300 px-3 py-2 text-center">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onDelete(inc.id); }}
+                        className="text-red-500 hover:text-red-700 p-1 transition-all"
+                        title="Excluir Registro"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </td>
                   </tr>
                 )) : (
-                  <tr><td colSpan={8} className="px-6 py-16 text-center text-gray-400 text-[10px] font-black uppercase italic tracking-[0.2em] bg-white">Os registros gravados aparecerão automaticamente nesta grade...</td></tr>
+                  <tr><td colSpan={9} className="px-6 py-16 text-center text-gray-400 text-[10px] font-black uppercase italic tracking-[0.2em] bg-white">Os registros gravados aparecerão automaticamente nesta grade...</td></tr>
                 )}
               </tbody>
             </table>
