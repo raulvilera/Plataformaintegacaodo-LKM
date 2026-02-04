@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient';
 import type { Incident } from '../types';
+import { sendToGoogleSheets, sendMultipleToGoogleSheets } from './googleSheetsService';
 
 /**
  * Busca todas as ocorrências do banco de dados
@@ -39,6 +40,9 @@ export async function createIncident(incident: Incident): Promise<{ success: boo
             return { success: false, error: error.message };
         }
 
+        // Enviar para Google Sheets em segundo plano
+        sendToGoogleSheets(incident).catch(err => console.error('Erro ao sincronizar com Sheets:', err));
+
         return { success: true };
     } catch (err) {
         console.error('Erro ao criar ocorrência:', err);
@@ -61,6 +65,9 @@ export async function createIncidents(incidents: Incident[]): Promise<{ success:
             console.error('Erro ao criar ocorrências:', error);
             return { success: false, error: error.message };
         }
+
+        // Enviar para Google Sheets em segundo plano
+        sendMultipleToGoogleSheets(incidents).catch(err => console.error('Erro ao sincronizar lote com Sheets:', err));
 
         return { success: true };
     } catch (err) {

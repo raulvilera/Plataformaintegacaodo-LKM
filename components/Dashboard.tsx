@@ -213,26 +213,24 @@ const Dashboard: React.FC<DashboardProps> = ({ user, incidents, onSave, onDelete
 
                 {/* Ajuste de Datas Lado a Lado */}
                 <div className={`grid gap-4 ${classification === 'SUSPENSÃO' ? 'grid-cols-2' : 'grid-cols-1'}`}>
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black text-white uppercase tracking-widest">DATA DO REGISTRO</label>
+                  <div className="space-y-1 cursor-pointer" onClick={() => openCalendar(regDateInputRef)}>
+                    <label className="text-[10px] font-black text-white uppercase tracking-widest block cursor-pointer">DATA DE REGISTRO DA OCORRÊNCIA</label>
                     <input
                       ref={regDateInputRef}
                       type="date"
                       value={registerDate}
                       onChange={e => setRegisterDate(e.target.value)}
-                      onClick={() => openCalendar(regDateInputRef)}
                       className="w-full h-12 px-4 bg-white border border-gray-300 rounded-xl text-xs font-bold text-black outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer"
                     />
                   </div>
                   {classification === 'SUSPENSÃO' && (
-                    <div className="space-y-1 animate-fade-in">
-                      <label className="text-[10px] font-black text-white uppercase tracking-widest">RETORNO</label>
+                    <div className="space-y-1 animate-fade-in cursor-pointer" onClick={() => openCalendar(retDateInputRef)}>
+                      <label className="text-[10px] font-black text-white uppercase tracking-widest block cursor-pointer">DATA PREVISTA DE RETORNO (SUSPENSÃO)</label>
                       <input
                         ref={retDateInputRef}
                         type="date"
                         value={returnDate}
                         onChange={e => setReturnDate(e.target.value)}
-                        onClick={() => openCalendar(retDateInputRef)}
                         className="w-full h-12 px-4 bg-white border border-yellow-400 rounded-xl text-xs font-bold text-black outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer"
                       />
                     </div>

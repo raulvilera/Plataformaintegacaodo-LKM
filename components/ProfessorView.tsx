@@ -223,7 +223,7 @@ const ProfessorView: React.FC<ProfessorViewProps> = ({ user, incidents, onSave, 
                   <input type="text" value={discipline} onChange={e => setDiscipline(e.target.value)} className="w-full h-11 px-4 bg-white border border-gray-300 rounded-xl text-xs font-bold text-black outline-none" placeholder="Ex: Português" />
                 </div>
                 <div className="space-y-1 cursor-pointer" onClick={triggerCalendar}>
-                  <label className="text-[10px] font-black text-white uppercase tracking-widest block cursor-pointer">DATA DO OCORRIDO</label>
+                  <label className="text-[10px] font-black text-white uppercase tracking-widest block cursor-pointer">DATA DE REGISTRO DO OCORRIDO</label>
                   <input
                     ref={dateInputRef}
                     type="date"

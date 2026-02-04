@@ -5,6 +5,7 @@ import ProfessorView from './components/ProfessorView';
 import { Incident, View, User } from './types';
 import { fetchIncidents, createIncidents, deleteIncident as deleteIncidentService, subscribeToIncidents } from './services/incidentsService';
 import { logout as supabaseLogout, getCurrentUser } from './services/authService';
+import { sendToGoogleSheets, sendMultipleToGoogleSheets } from './services/googleSheetsService';
 
 const App: React.FC = () => {
   const [view, setView] = useState<View>('login');
@@ -92,6 +93,8 @@ const App: React.FC = () => {
     setView('login');
   };
 
+
+
   const handleSaveIncident = async (newIncident: Incident | Incident[]) => {
     const itemsToAdd = Array.isArray(newIncident) ? newIncident : [newIncident];
 
@@ -99,6 +102,13 @@ const App: React.FC = () => {
       const { success, error } = await createIncidents(itemsToAdd);
 
       if (success) {
+        // Enviar para Google Sheets após salvar no Supabase
+        if (Array.isArray(newIncident)) {
+          await sendMultipleToGoogleSheets(newIncident);
+        } else {
+          await sendToGoogleSheets(newIncident);
+        }
+
         // A atualização será feita automaticamente via subscription em tempo real
         // Mas vamos recarregar para garantir
         await loadIncidents();
