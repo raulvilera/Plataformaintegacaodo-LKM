@@ -25,20 +25,20 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
     try {
       if (activeTab === 'gestao') {
-        if (email !== 'gestao@escola.com') {
-          setError('Área restrita. Email obrigatório: gestao@escola.com');
+        if (email.toLowerCase() !== 'gestao@escola.com') {
+          setError('Acesso negado. A área de Gestão é restrita ao e-mail gestao@escola.com');
           setIsLoading(false);
           return;
         }
       }
 
       if (activeTab === 'professor') {
-        const validDomains = ['prof.educacao.sp.gov.br', 'professor.educacao.sp.gov.br'];
+        const validDomains = ['prof.educacao.sp.gov.br'];
         const emailParts = email.split('@');
         const emailDomain = emailParts.length > 1 ? emailParts[1].toLowerCase() : '';
 
         if (!validDomains.includes(emailDomain)) {
-          setError('Acesso restrito a emails institucionais (@prof.educacao.sp.gov.br ou @professor.educacao.sp.gov.br)');
+          setError('Acesso restrito. Utilize seu e-mail institucional (@prof.educacao.sp.gov.br)');
           setIsLoading(false);
           return;
         }
@@ -168,13 +168,13 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
           <div className="space-y-2">
             <label className="text-[#002b5c] text-[10px] font-black block ml-1 uppercase tracking-widest opacity-70">
-              {activeTab === 'gestao' ? 'Email de Gestão' : 'Usuário Institucional'}
+              {activeTab === 'gestao' ? 'E-mail de Gestão' : 'E-mail Institucional'}
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder={activeTab === 'gestao' ? 'gestao@escola.com' : 'professor@educacao.sp.gov.br'}
+              placeholder={activeTab === 'gestao' ? 'gestao@escola.com' : 'usuario@prof.educacao.sp.gov.br'}
               className="w-full h-13 px-5 bg-[#f3f6fa] border-2 border-transparent rounded-2xl focus:border-[#004a99] focus:bg-white outline-none text-sm text-black font-bold transition-all shadow-sm placeholder:text-[#adb5bd] placeholder:font-medium"
               required
             />
